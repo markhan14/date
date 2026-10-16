@@ -1,1 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pantau Lahan Sawah</title>
+<style>
+:root{--g1:#0a8f5b;--g2:#16b886;--bg:#f3f6f4;--card:#fff;--tx:#17251d;--mut:#6b7a72;--bd:#e1e8e3;--ok:#1f8a3b;--okbg:#e3f5e7;--bad:#c25a1d;--badbg:#fdebdd}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font:14px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;color:var(--tx);background:radial-gradient(circle at 30% 20%,#1d2b3a,#0b1118);display:flex;align-items:center;justify-content:center}
+/* ===== FRAME HP ===== */
+.phone{position:relative;width:380px;height:780px;max-height:96vh;background:var(--bg);border:11px solid #0c0c0e;border-radius:52px;box-shadow:0 0 0 2px #3a3d44,0 30px 80px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column}
+.phone::before{content:"";position:absolute;right:-14px;top:150px;width:3px;height:70px;background:#3a3d44;border-radius:3px}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#0c0c0e;border-radius:0 0 18px 18px;z-index:5}
+.sb{flex:none;height:34px;padding:8px 22px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:12px;font-weight:600;color:#fff;background:var(--sb,#000);z-index:4}
+.sb .ic{display:flex;gap:6px;align-items:center}.sb svg{height:12px;width:auto;fill:#fff;display:block}
+#clk{color:#fff;text-shadow:0 0 6px rgba(255,255,255,.6);letter-spacing:.2px}
+.scr{flex:1;overflow-y:auto;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+.hero{background:linear-gradient(160deg,var(--g1),var(--g2));color:#fff;padding:20px 20px 40px;border-radius:0 0 34px 34px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-50px;top:-30px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.12)}
+.brand{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.logo{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.95);display:grid;place-items:center;font-size:20px}
+.brand b{display:block;font-size:15px}.brand small{opacity:.85;font-size:11px}
+.hero h2{margin:0;font-size:26px;line-height:1.15}.hero p{margin:6px 0 0;opacity:.9;font-size:13px}
+.pg{display:none;padding:14px 14px 20px;margin-top:-22px;position:relative;z-index:2}.pg.on{display:block}
+.dock{flex:none;background:#fff;display:flex;justify-content:center;padding:6px 0 8px;border-top:1px solid var(--bd)}
+.fab{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border:0;border-radius:99px;padding:7px 20px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 4px 10px rgba(10,143,91,.35)}
+nav{display:flex;background:#fff;padding:0 6px;max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease}
+nav.open{max-height:90px;padding:4px 6px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--bd)}
+nav button{flex:1;background:none;border:0;color:var(--mut);font:inherit;font-size:11px;padding:4px;cursor:pointer}
+nav button i{display:block;font-style:normal;font-size:20px}
+nav button.on{color:var(--g1);font-weight:700}
+.home{width:100px;height:4px;background:#222;border-radius:9px;margin:0 auto 6px}
+/* ===== KOMPONEN ===== */
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(10,60,40,.05)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:9px 10px}
+.stat b{display:block;font-size:20px}.stat span{color:var(--mut);font-size:11px}
+label{display:block;font-size:11px;color:var(--mut);margin:8px 0 3px}
+input,select{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:#fafcfb;color:var(--tx);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border:0;border-radius:12px;padding:11px 14px;font:inherit;font-weight:600;cursor:pointer;width:100%;margin-top:6px}
+.btn.o{background:#fff;color:var(--g1);border:1px solid var(--g1)}
+.sm{background:none;border:1px solid var(--bd);border-radius:8px;color:var(--mut);padding:3px 9px;font-size:11px;cursor:pointer}
+.live{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.live div{background:var(--bg);border-radius:12px;padding:8px 10px}.live span{display:block;font-size:11px;color:var(--mut)}.live b{font-size:17px}
+.meta{color:var(--mut);font-size:12px}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs button{flex:1;border:1px solid var(--bd);background:#fff;border-radius:99px;padding:6px;font:inherit;font-size:12px;cursor:pointer}
+.tabs button.on{border-color:var(--g1);color:var(--g1);font-weight:700}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.badge{padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.p{background:var(--okbg);color:var(--ok)}.t{background:var(--badbg);color:var(--bad)}
+.bar{height:6px;background:var(--bd);border-radius:9px;margin:8px 0 3px;overflow:hidden}.bar i{display:block;height:100%}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0}
+.chip{border:1px solid var(--bd);border-radius:9px;padding:3px 8px;font-size:12px;background:#fafcfb}.chip small{color:var(--mut)}
+h3{font-size:12px;margin:9px 0 2px}ul{margin:3px 0 0;padding-left:17px;font-size:12.5px}
+/* ===== LAYAR SAMBUTAN (seperti contoh) ===== */
+.wel{flex:1;display:flex;flex-direction:column;background:#fff;position:relative;min-height:0;overflow:hidden}
+.wel.off{display:none}
+.app{flex:1;display:none;flex-direction:column;min-height:0}.app.on{display:flex}
+.wh{flex:none;background:linear-gradient(165deg,#0a9a68,#16b98a 70%,#19c196);color:#fff;padding:22px 22px 58px;position:relative;overflow:hidden}
+.wh::after{content:"";position:absolute;right:-60px;top:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.11)}
+.wb{display:flex;gap:10px;align-items:center;margin-bottom:34px;position:relative;z-index:1}
+.wl{width:40px;height:40px;border-radius:12px;background:#fff;display:grid;place-items:center}
+.wl svg{width:22px;height:22px;stroke:#0a9a68;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wb b{display:block;font-size:17px}.wb small{font-size:11px;opacity:.9}
+.wh h1{font-size:32px;line-height:1.12;margin:0 0 12px;position:relative;z-index:1}
+.wh p{margin:0;font-size:13.5px;line-height:1.5;opacity:.92;max-width:270px;position:relative;z-index:1}
+.wave{position:absolute;left:0;bottom:-1px;width:100%;height:40px;z-index:1}
+.wc{flex:1;padding:6px 16px 0;overflow:auto;scrollbar-width:none}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.f{border:1px solid #e6ece8;border-radius:12px;padding:10px;display:flex;gap:8px;align-items:center;font-size:11px;line-height:1.3;color:#34453b;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.f i{flex:none;width:26px;height:26px;border:1px solid #cfe3d8;border-radius:8px;display:grid;place-items:center;background:#f2faf6}
+.f svg{width:14px;height:14px;stroke:#0a9a68;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.dv{display:flex;align-items:center;gap:10px;color:#8a978f;font-size:11px;margin:4px 0 12px}
+.dv::before,.dv::after{content:"";flex:1;height:1px;background:#e3e9e5}
+.gb{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid #dfe5e1;border-radius:12px;padding:13px;font:inherit;font-weight:600;font-size:14px;color:#222;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.gb svg{width:18px;height:18px;stroke:#0a9a68;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tc{text-align:center;font-size:10.5px;color:#7a877f;margin:16px 6px 14px;line-height:1.5}.tc a{color:#0a9a68;font-weight:600}
+.sec{display:flex;justify-content:center;align-items:center;gap:6px;font-size:11px;color:#7a877f}
+.sec svg{width:13px;height:13px;stroke:#7a877f;fill:none;stroke-width:1.8;stroke-linejoin:round}
+.dev{position:absolute;left:12px;bottom:26px;width:30px;height:30px;border-radius:50%;background:#1a1a1c;color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;box-shadow:0 0 0 2px rgba(255,255,255,.15)}
+.hb{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);width:110px;height:4px;border-radius:9px;background:#111}
+.out{margin-left:auto;background:rgba(255,255,255,.22);border:0;color:#fff;border-radius:99px;padding:5px 12px;font:inherit;font-size:11px;cursor:pointer;position:relative;z-index:1}
+/* di HP asli: tanpa bingkai */
+@media (max-width:480px){.phone{width:100%;height:100%;max-height:none;border:0;border-radius:0;box-shadow:none}.phone::before{display:none}.hero{padding-top:20px}}
+</style>
+</head>
+<body>
+<div class="phone">
+ <div class="notch"></div>
+ <div class="sb">
+  <span id="clk">--:--</span>
+  <span class="ic">
+   <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+   <svg viewBox="0 0 24 18"><path d="M12 14.2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM12 3C7.6 3 3.6 4.7.6 7.6l2 2.1C5 7.4 8.4 6 12 6s7 1.4 9.4 3.7l2-2.1C20.4 4.7 16.4 3 12 3zm0 5.6c-2.9 0-5.6 1.1-7.6 3l2.1 2.1c1.5-1.4 3.4-2.1 5.5-2.1s4 .7 5.5 2.1l2.1-2.1c-2-1.9-4.7-3-7.6-3z"/></svg>
+   <svg viewBox="0 0 28 12"><rect x=".5" y=".5" width="23" height="11" rx="3" fill="none" stroke="#fff" opacity=".6"/><rect x="2" y="2" width="17" height="8" rx="1.8"/><rect x="25" y="4" width="2.5" height="4" rx="1"/></svg>
+  </span>
+ </div>
+
+ <!-- LAYAR SAMBUTAN -->
+ <div class="wel" id="welcome">
+  <div class="wh">
+   <div class="wb"><div class="wl"><svg viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19c3-5 6-8 10-10"/></svg></div><div><b>PantauLahan</b><small>Sawah produktif, panen optimal</small></div></div>
+   <h1>Halo,<br>Selamat Datang!</h1>
+   <p>Masuk untuk mulai memantau kondisi lahan sawahmu dengan mudah.</p>
+   <svg class="wave" viewBox="0 0 380 40" preserveAspectRatio="none"><path d="M0 24C60 2 120 40 200 24S320 4 380 20V40H0Z" fill="#fff"/></svg>
+  </div>
+  <div class="wc">
+   <div class="fg">
+    <div class="f"><i><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 13h6"/></svg></i><span>Catat lahan lebih mudah &amp; cepat</span></div>
+    <div class="f"><i><svg viewBox="0 0 24 24"><path d="M12 4l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8z"/></svg></i><span>Nilai produktif otomatis &amp; akurat</span></div>
+    <div class="f"><i><svg viewBox="0 0 24 24"><path d="M13 3L5 13h6l-1 8 8-10h-6z"/></svg></i><span>Pantau pH, suhu &amp; kelembapan</span></div>
+    <div class="f"><i><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg></i><span>Saran tanam sesuai kondisi lahan</span></div>
+   </div>
+   <div class="dv"><span>Mulai dengan</span></div>
+   <button class="gb" onclick="masuk()"><svg viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19c3-5 6-8 10-10"/></svg>Mulai Pantau Lahan</button>
+   <p class="tc">Dengan masuk, kamu menyetujui <a>Syarat &amp; Ketentuan</a> dan <a>Kebijakan Privasi</a> PantauLahan</p>
+   <div class="sec"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg>Security &amp; Safe</div>
+  </div>
+  <div class="hb"></div>
+ </div>
+
+ <!-- APLIKASI -->
+ <div class="app" id="app">
+ <div class="scr">
+  <header class="hero">
+   <div class="brand"><div class="logo">🌱</div><div><b>PantauLahan</b><small>Sawah produktif, panen optimal</small></div><button class="out" onclick="keluar()">← Beranda</button></div>
+   <h2>Halo,<br>Selamat Datang!</h2>
+   <p>Pantau kondisi lahan sawah secara otomatis dan dapatkan saran tanam.</p>
+  </header>
+
+  <!-- BERANDA -->
+  <section class="pg on" id="p-home">
+   <div class="stats">
+    <div class="stat"><b id="sT">0</b><span>Lahan (<em id="sH">0</em> ha)</span></div>
+    <div class="stat"><b id="sP" style="color:var(--ok)">0</b><span>Produktif</span></div>
+    <div class="stat"><b id="sN" style="color:var(--bad)">0</b><span>Tdk produktif</span></div>
+   </div>
+   <div class="card">
+    <b>📡 Monitor otomatis</b>
+    <label>Lahan yang dipantau</label><select id="mSel"></select>
+    <div class="live">
+     <div><span>pH tanah</span><b id="vPh">–</b></div>
+     <div><span>Suhu</span><b id="vT">–</b></div>
+     <div><span>Kelembapan udara</span><b id="vH">–</b></div>
+     <div><span>Status lahan</span><b id="vS">–</b></div>
+    </div>
+    <button class="btn" id="bSim" onclick="simulasi()">▶ Mulai simulasi sensor</button>
+    <button class="btn o" onclick="usb()">🔌 Sambungkan sensor (USB)</button>
+    <div class="meta" id="st" style="margin-top:8px">Belum aktif</div>
+   </div>
+   <p class="meta">Skor 0–100: air 20, pH 20, kesuburan 15, drainase 10, hasil panen 15, suhu 10, kelembapan udara 10. Skor ≥ 60 = produktif. Penilaian indikatif; konfirmasi dengan uji tanah/penyuluh setempat.</p>
+  </section>
+
+  <!-- TAMBAH -->
+  <section class="pg" id="p-add">
+   <div class="card">
+    <b>➕ Tambah lahan</b>
+    <label>Nama / lokasi lahan</label><input id="nama" placeholder="mis. Petak Blok A, Desa X">
+    <div class="row">
+     <div><label>Luas (ha)</label><input id="luas" type="number" step="0.01" value="0.5"></div>
+     <div><label>pH tanah</label><input id="ph" type="number" step="0.1" value="6.5"></div>
+    </div>
+    <label>Sumber air</label>
+    <select id="air"><option value="teknis">Irigasi teknis</option><option value="semi">Semi teknis</option><option value="tadah">Tadah hujan</option><option value="none">Tidak ada air</option></select>
+    <div class="row">
+     <div><label>Drainase</label><select id="dr"><option value="baik">Baik</option><option value="sedang">Sedang</option><option value="buruk">Buruk / tergenang</option></select></div>
+     <div><label>Kesuburan</label><select id="sub"><option value="tinggi">Tinggi</option><option value="sedang">Sedang</option><option value="rendah">Rendah</option></select></div>
+    </div>
+    <label>Hasil panen terakhir (ton GKG/ha, opsional)</label><input id="hasil" type="number" step="0.1">
+    <button class="btn" onclick="tambah()">Tambah &amp; nilai lahan</button>
+   </div>
+  </section>
+
+  <!-- DAFTAR LAHAN -->
+  <section class="pg" id="p-list">
+   <div class="tabs" id="ftabs">
+    <button data-f="all" onclick="setF('all')">Semua</button>
+    <button data-f="P" onclick="setF('P')">Produktif</button>
+    <button data-f="T" onclick="setF('T')">Tdk produktif</button>
+   </div>
+   <div id="list"></div>
+  </section>
+ </div>
+
+ <div class="dock"><button class="fab" id="fab" onclick="toggleNav()">Menu</button></div>
+ <nav id="nav">
+  <button class="on" data-p="home" onclick="go('home')"><i>🛖</i>Pantau</button>
+  <button data-p="add" onclick="go('add')"><i>+</i>Tambah</button>
+  <button data-p="list" onclick="go('list')"><i>🌱</i>Lahan</button>
+ </nav>
+ </div>
+</div>
+
+<script>
+/* ================== DATA ================== */
+let data=[
+ {id:1,nama:"Petak A Desa Siwuluh",luas:0.8,air:"teknis",ph:6.4,dr:"baik",sub:"tinggi",hasil:6.1},
+ {id:2,nama:"Petak B Luwungragi",luas:0.4,air:"tadah",ph:5.0,dr:"sedang",sub:"rendah",hasil:2.8},
+ {id:3,nama:"Petak C Bulakamba",luas:0.6,air:"semi",ph:6.8,dr:"buruk",sub:"sedang",hasil:3.2}
+];
+let nid=4,filter='all',sim=null,port=null;
+const $=id=>document.getElementById(id);
+const AIR={teknis:"Irigasi teknis",semi:"Semi teknis",tadah:"Tadah hujan",none:"Tanpa air"};
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ================== PENILAIAN ================== */
+function nilai(l){
+ let s=0;
+ s+={teknis:20,semi:14,tadah:8,none:2}[l.air];
+ s+=(l.ph>=5.5&&l.ph<=7.5)?20:((l.ph>=5&&l.ph<5.5)||(l.ph>7.5&&l.ph<=8))?12:4;
+ s+={baik:10,sedang:7,buruk:2}[l.dr];
+ s+={tinggi:15,sedang:10,rendah:4}[l.sub];
+ s+=l.hasil==null||isNaN(l.hasil)?8:l.hasil>=5?15:l.hasil>=3.5?10:3;
+ s+=l.suhu==null?6:(l.suhu>=24&&l.suhu<=32)?10:((l.suhu>=20&&l.suhu<24)||(l.suhu>32&&l.suhu<=35))?6:2;
+ s+=l.rh==null?6:(l.rh>=60&&l.rh<=85)?10:((l.rh>=45&&l.rh<60)||(l.rh>85&&l.rh<=92))?6:2;
+ return s;
+}
+
+function saran(l,skor){
+ const r=saran0(l,skor);
+ if(l.suhu!=null){
+  if(l.suhu>33)r.tips.push("Suhu tinggi: siram pagi/sore dan pakai mulsa; hindari bawang merah saat terik.");
+  if(l.suhu<20)r.tips.push("Suhu rendah: pertumbuhan padi melambat, pilih sayuran sejuk (kubis, wortel).");
+ }
+ if(l.rh!=null){
+  if(l.rh>90)r.tips.push("Kelembapan udara sangat tinggi: waspada jamur/blast, jaga jarak tanam.");
+  if(l.rh<45)r.tips.push("Udara sangat kering: tambah frekuensi irigasi.");
+ }
+ return r;
+}
+function saran0(l,skor){
+ if(skor>=60){
+  const c=[["Padi","musim hujan / air cukup"],["Bawang merah","kemarau, bedengan"],["Cabai","kemarau"],["Tomat",""],["Sayur daun","kangkung, bayam, sawi"],["Jagung & kedelai","rotasi palawija"],["Semangka / melon","kemarau"]];
+  const tips=["Lahan cocok untuk semua jenis tanaman; atur pola tanam padi – palawija/hortikultura agar tanah tetap sehat."];
+  if(l.air==="semi")tips.push("Air semi teknis: padi di musim hujan, bawang/cabai di musim kemarau.");
+  if(l.dr!=="baik")tips.push("Untuk bawang & cabai buat bedengan tinggi dan parit pembuang.");
+  return {c,tips};
+ }
+ const m=new Map(),add=(n,w)=>{if(!m.has(n))m.set(n,w)},tips=[];
+ if(l.air==="tadah"||l.air==="none"){add("Jagung","tahan kekurangan air");add("Kacang hijau","umur pendek, hemat air");add("Kacang tanah","cocok tanah ringan");add("Singkong","sangat toleran kering");tips.push("Bangun embung/sumur pantek atau pompa untuk menambah air.");}
+ if(l.dr==="buruk"){add("Kangkung","suka tanah basah");add("Talas","toleran genangan");add("Padi toleran rendaman","mis. Inpara");tips.push("Perbaiki saluran drainase agar genangan tidak lama.");}
+ if(l.ph<5.5){add("Singkong","toleran tanah masam");add("Ubi jalar","toleran masam");add("Kacang tanah","");tips.push("Tanah masam: beri kapur dolomit (± 1–2 ton/ha) lalu uji ulang pH.");}
+ if(l.ph>7.5){add("Sorgum","toleran pH tinggi");add("Kangkung","");tips.push("pH tinggi: tambahkan bahan organik dan belerang bila perlu.");}
+ if(l.sub==="rendah"){add("Kedelai","menambah nitrogen tanah");add("Kacang panjang","fiksasi N");add("Kacang hijau","");tips.push("Kesuburan rendah: beri kompos/pupuk kandang 5–10 ton/ha atau tanam pupuk hijau.");}
+ add("Jagung","pilihan aman");add("Kacang hijau","pilihan aman");
+ return {c:[...m.entries()].slice(0,6),tips};
+}
+
+/* ================== UI ================== */
+function go(p){
+ document.querySelectorAll('.pg').forEach(e=>e.classList.toggle('on',e.id==='p-'+p));
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+ document.querySelector('.scr').scrollTop=0;
+}
+function toggleNav(){
+ const n=$('nav'),o=!n.classList.contains('open');
+ n.classList.toggle('open',o);
+ $('fab').textContent=o?'Tutup menu':' Menu';
+}
+function setF(f){filter=f;render()}
+function tambah(){
+ const h=parseFloat($('hasil').value);
+ data.unshift({id:nid++,nama:$('nama').value.trim()||("Lahan "+nid),luas:parseFloat($('luas').value)||0,air:$('air').value,ph:parseFloat($('ph').value)||7,dr:$('dr').value,sub:$('sub').value,hasil:isNaN(h)?null:h});
+ $('nama').value='';$('hasil').value='';render();go('list');
+}
+function hapus(id){data=data.filter(x=>x.id!==id);render()}
+
+function render(){
+ const v=$('mSel').value;
+ let P=0,N=0,H=0;
+ const rows=data.map(l=>{const s=nilai(l),ok=s>=60;ok?P++:N++;H+=l.luas;return {l,s,ok}});
+ $('sT').textContent=data.length;$('sP').textContent=P;$('sN').textContent=N;$('sH').textContent=H.toFixed(2);
+ document.querySelectorAll('#ftabs button').forEach(b=>b.classList.toggle('on',b.dataset.f===filter));
+ $('mSel').innerHTML=data.map(l=>`<option value="${l.id}">${esc(l.nama)}</option>`).join('');
+ if(v)$('mSel').value=v;
+ $('list').innerHTML=rows.filter(r=>filter==='all'||(filter==='P')===r.ok).map(({l,s,ok})=>{
+  const sr=saran(l,s);
+  return `<div class="card"><div class="hd"><b>${esc(l.nama)}</b><span><span class="badge ${ok?'p':'t'}">${ok?'Produktif':'Tidak produktif'}</span> <button class="sm" onclick="hapus(${l.id})">Hapus</button></span></div>
+  <div class="meta">${l.luas} ha · ${AIR[l.air]} · pH ${(+l.ph).toFixed(1)}${l.suhu!=null?` · ${l.suhu.toFixed(1)}°C · RH ${Math.round(l.rh)}%`:''} · drainase ${l.dr} · kesuburan ${l.sub}${l.hasil!=null?` · panen ${l.hasil} t/ha`:''}</div>
+  <div class="bar"><i style="width:${s}%;background:${ok?'var(--ok)':'var(--bad)'}"></i></div><div class="meta">Skor ${s}/100</div>
+  <h3>${ok?'Bisa ditanami semua jenis, misalnya:':'Disarankan ditanam:'}</h3>
+  <div class="chips">${sr.c.map(c=>`<span class="chip">${c[0]}${c[1]?` <small>· ${c[1]}</small>`:''}</span>`).join('')}</div>
+  <h3>Catatan</h3><ul>${sr.tips.map(t=>`<li>${t}</li>`).join('')}</ul></div>`}).join('')||'<p class="meta">Belum ada lahan.</p>';
+}
+
+/* ================== MONITOR OTOMATIS ================== */
+function terap(ph,suhu,rh){
+ const l=data.find(x=>x.id==$('mSel').value);
+ if(!l||isNaN(ph+suhu+rh))return;
+ l.ph=ph;l.suhu=suhu;l.rh=rh;
+ $('vPh').textContent=ph.toFixed(1);
+ $('vT').textContent=suhu.toFixed(1)+' °C';
+ $('vH').textContent=Math.round(rh)+' %';
+ const s=nilai(l);
+ $('vS').textContent=(s>=60?'Produktif':'Tidak produktif')+' ('+s+')';
+ render();
+}
+function simulasi(){
+ if(sim){clearInterval(sim);sim=null;$('bSim').textContent='▶ Mulai simulasi sensor';$('st').textContent='Dihentikan';return}
+ const l=data.find(x=>x.id==$('mSel').value);if(!l)return;
+ let a={ph:+l.ph,t:l.suhu??29,h:l.rh??75};
+ $('bSim').textContent='■ Hentikan simulasi';
+ $('st').textContent='Simulasi aktif (data acak untuk demo, bukan sensor asli)';
+ sim=setInterval(()=>{
+  a.ph=clamp(a.ph+(Math.random()-.5)*.3,4,9);
+  a.t=clamp(a.t+(Math.random()-.5)*1.2,18,40);
+  a.h=clamp(a.h+(Math.random()-.5)*5,30,98);
+  terap(a.ph,a.t,a.h);
+ },2000);
+}
+/* Sensor asli via USB (Web Serial). ESP32 mengirim 1 baris JSON: {"ph":6.5,"suhu":29.1,"rh":78} */
+async function usb(){
+ if(!('serial' in navigator)){$('st').textContent='Browser tidak mendukung Web Serial. Gunakan Chrome/Edge di komputer.';return}
+ try{
+  port=await navigator.serial.requestPort();
+  await port.open({baudRate:115200});
+  $('st').textContent='Sensor USB terhubung, menunggu data...';
+  const rd=port.readable.pipeThrough(new TextDecoderStream()).getReader();
+  let buf='';
+  for(;;){
+   const {value,done}=await rd.read();if(done)break;
+   buf+=value;let i;
+   while((i=buf.indexOf('\n'))>=0){
+    const ln=buf.slice(0,i).trim();buf=buf.slice(i+1);
+    try{const j=JSON.parse(ln);terap(+j.ph,+j.suhu,+j.rh);$('st').textContent='Sensor USB aktif, data masuk otomatis'}catch(e){}
+   }
+  }
+ }catch(e){$('st').textContent='Gagal menyambung: '+e.message}
+}
+
+function masuk(){$('welcome').classList.add('off');$('app').classList.add('on')}
+function keluar(){$('app').classList.remove('on');$('welcome').classList.remove('off')}
+
+/* jam di status bar */
+function jam(){$('clk').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}
+jam();setInterval(jam,1000);
+render();
+</script>
+</body>
+</html>
 
